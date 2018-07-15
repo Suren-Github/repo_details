@@ -5,12 +5,18 @@ angular.module('myApp.view1')
 
     var transaction = {
 
-      createTable: (tName) => {
+      createTable: (db) => {
 
-        let db = openDatabase('gitdb', '1.0', 'Git DB', 2 * 1024 * 1024);
+        return new Promise((resolve, reject) => {
 
-        db.transaction(function (tx) {
-          tx.executeSql('CREATE TABLE IF NOT EXISTS GIT(id unique, user_id, user_name, repo_name, avatar_url, git_url, created_at)');
+          db.transaction(function (tx) {
+
+            tx.executeSql('CREATE TABLE IF NOT EXISTS gitdetails (user_id text, user_name text, repo_name text, avatar_url text, git_url text, created_at text)');
+
+          });
+
+          resolve();
+
         });
 
       }

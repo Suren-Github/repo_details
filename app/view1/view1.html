@@ -1,1 +1,54 @@
-<p>This is the partial for view 1.</p>
+<div class="container">
+    <h3> User Repos: </h3>
+    <hr />
+    <div class="row">
+        <form>
+            <div class="form-group col-md-12">
+                <div class="form-group col-md-4 left-pad-0">
+                    <input type="text" class="form-control" title="User name" ng-model="uName">
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="button" class="btn btn-primary" ng-click="getUserRepos(uName)">Get Repos</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <h3> Most Active Users: </h3>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <span ng-repeat="user in users" ng-click=getUserRepos(user) class="cursor-pointer highlighter-txt">{{user}}
+                <span ng-if="$index!=users.length-1">, </span>
+            </span>
+        </div>
+    </div>
+
+    <br/>
+
+    <h3 ng-init="initRepoDetails()"> Repo Details: </h3>
+    <hr />
+
+    <table class="git-table table table-striped table-bordered">
+        <tr>
+            <th>S.No.</th>
+            <th>User Name</th>
+            <th>Repo Name</th>
+            <!-- <th>Avatar</th> -->
+            <th>GIT Link</th>
+            <th>Created At</th>
+        </tr>
+
+        <tr ng-repeat="repo in repoDetails">
+            <td>{{$index}}</td>
+            <td>{{repo.user_name}}</td>
+            <td>{{repo.repo_name}}</td>
+            <!-- <td><img width="75px" height="75px" ng-src={{repo.avatar_url}} /></td> -->
+            <td>
+                <a target="blank" ng-href={{repo.git_url}}>{{repo.user_name}}'s link</a>
+            </td>
+            <td>{{repo.created_at | date}}</td>
+        </tr>
+    </table>
+</div>

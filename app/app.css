@@ -23,3 +23,19 @@
   content: "|";
   padding-right: 0.3em;
 }
+
+h3{
+  border-color: #f3f3f3;
+}
+
+.left-pad-0 {
+  padding-left: 0;
+}
+
+.cursor-pointer{
+  cursor:pointer
+}
+
+.highlighter-txt {
+  color: #2f6f9f;
+}

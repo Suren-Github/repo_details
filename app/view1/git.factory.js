@@ -10,10 +10,16 @@ angular.module('myApp.view1')
         defaultValues: () => {
 
           const gitValues = {
-            TBL_NAME: 'GIT_DETAILS'
+            DB_NAME: 'gitdb'
           };
 
           return gitValues;
+        },
+
+        mostActiveUsers: () => {
+          return [
+            'fabpot', 'andrew', 'taylorotwell', 'egoist', 'ornicar', 'bebraw'
+          ];
         },
 
         /** API request to fetch the user repos */
@@ -33,9 +39,19 @@ angular.module('myApp.view1')
 
         },
 
-        storeRepoDetails: () => {
+        storeRepoDetails: (repoDetails, db) => {
           return new Promise((resolve, reject) => {
 
+            db.transaction(function (tx) {
+              
+              angular.forEach(repoDetails, (value) => {
+                tx.executeSql('INSERT INTO gitdetails (user_id, user_name, repo_name, avatar_url, git_url, created_at) VALUES (?,?,?,?,?,?)',
+                  [value.user_id, value.user_name, value.repo_name, value.avatar_url,
+                  value.git_url, value.created_at]);
+              });
+
+              resolve(true);
+            });
 
           });
         }

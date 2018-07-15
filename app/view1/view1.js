@@ -9,68 +9,91 @@ angular.module('myApp.view1', ['ngRoute'])
     });
   }])
 
-  .controller('View1Ctrl', ['Git', 'Transaction', function (gitFactory, transactionFactory) {
+  .controller('View1Ctrl', ['$scope', 'Git', 'Transaction', function ($scope, gitFactory, transactionFactory) {
 
     const defaultValues = gitFactory.defaultValues();
+    var db = openDatabase(defaultValues.DB_NAME, '1.0', 'Git DB', 2 * 1024 * 1024);
 
     function Git() {
     };
 
-    Git.prototype.retriveUserRepos = function (uName) {
+    Git.prototype.retriveUserRepos = (uName) => {
 
-      gitFactory.retriveUserRepos(uName)
-        .then((response) => {
+      return new Promise((resolve, reject) => {
 
-          let repos = response,
-            userDetails = [];
+        gitFactory.retriveUserRepos(uName)
+          .then((response) => {
 
-          angular.forEach(repos, (value, key) => {
+            console.log(response);
 
-            let owner = value.owner,
-              mockDetails = {
-                user_id: owner.id,
-                user_name: owner.login,
-                repo_name: value.name,
-                avatar_url: owner.avatar_url,
-                git_url: owner.url,
-                created_at: value.created_at
-              };
+            let repos = response,
+              repoDetails = [];
 
-            userDetails.push(mockDetails);
+            angular.forEach(repos, (value, key) => {
 
-          });
+              let owner = value.owner,
+                mockDetails = {
+                  user_id: owner.id,
+                  user_name: owner.login,
+                  repo_name: value.name,
+                  avatar_url: owner.avatar_url,
+                  git_url: owner.url,
+                  created_at: value.created_at
+                };
 
-
-
-          gitFactory.storeRepoDetails()
-            .then((response3) => {
+              repoDetails.push(mockDetails);
 
             });
 
+            resolve(repoDetails);
 
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error("retrieveUserRepos ", error);
-        })
+          })
+          .catch((error) => {
+            reject(error);
+          });
+
+      });
+    };
+
+    Git.prototype.storeRepoDetails = (repoDetails) => {
+      gitFactory.storeRepoDetails(repoDetails, db)
+        .then((response) => {
+          console.log("Repo Details Stored Successfully");
+        });
+    };
+
+    Git.prototype.processUserRepos = (uName) => {
+      return git.retriveUserRepos(uName)
+        .then((repoDetails) => {
+
+          $scope.$apply(() => {
+            $scope.repoDetails = repoDetails;
+          });
+
+          return git.storeRepoDetails(repoDetails, db);
+
+        });
     };
 
     var git = new Git();
-    debugger;
+
     let uName = 'octocat';
 
-    (initOnLoad = () => {
-      transactionFactory.createTable(defaultValues.TBL_NAME)
+    $scope.initRepoDetails = () => {
+      transactionFactory.createTable(db)
         .then((response2) => {
+
+          $scope.users = gitFactory.mostActiveUsers();
+          git.processUserRepos(uName);
 
         })
         .catch((error) => {
           console.error("createTable ", error);
         });
-    })();
+    };
 
-
-    git.retriveUserRepos(uName);
-
+    $scope.getUserRepos = (uName) => {
+      git.processUserRepos(uName);
+    };
 
   }]);
